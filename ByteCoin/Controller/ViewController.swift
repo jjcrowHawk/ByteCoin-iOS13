@@ -29,14 +29,21 @@ class ViewController: UIViewController {
         currencyPicker.dataSource = self
         currencyPicker.delegate = self
         
-        coinManager.getRates()
+        setCurrencyLabel(coinManager.currencyArray.first!)
+        coinManager.getCurrencyRate(currency: coinManager.currencyArray.first!)
     }
-
-
+    
+    func setCurrencyLabel(_ currency: String) {
+        currencyLabel.text = currency
+    }
+    
+    func setValueLabel(_ rate: Double){
+        valueLabel.text = String(format: "%.2f", rate)
+    }
 }
 
 
-// MARK: - EXTENSIONS
+// MARK: - UIPICKER DELEGATE EXTENSIONS
 
 extension ViewController: UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -54,7 +61,16 @@ extension ViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return coinManager.currencyArray[row]
     }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        self.setCurrencyLabel(coinManager.currencyArray[row])
+        self.setValueLabel(0.0)
+        coinManager.getCurrencyRate(currency: coinManager.currencyArray[row])
+    }
 }
+
+
+// MARK: - COINMANAGER DELEGATE EXTENSIONS
 
 extension ViewController: CoinHandlerDelegate {
     func handleGetRateResponse(response: RateResponse?, error: Error?) {
@@ -63,12 +79,13 @@ extension ViewController: CoinHandlerDelegate {
             return
         }
         
-        guard let ratesResponse = response else {
+        guard let rateResponse = response else {
             return
         }
         
-        print("data has come succesfully")
-        print(ratesResponse)
+        DispatchQueue.main.async {
+            self.setValueLabel(rateResponse.rate)
+        }
     }
     
     func handleRatesResponse(response: GetRatesResponse?, error: Error?) {

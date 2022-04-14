@@ -46,8 +46,10 @@ struct CoinManager {
         
     }
     
-    func getRate(currency: String){
+    func getCurrencyRate(currency: String){
         let urlString = "\(baseURL)/\(currency)"
+        
+        print(urlString)
 
         if let url = URL(string: urlString) {
             
@@ -60,7 +62,7 @@ struct CoinManager {
                     }
                     
                     if let responseData = data {
-                        handleGetRatesResponse(responseData)
+                        handleGetCurrencyRateResponse(responseData)
                     }
                 }
                 .resume()
@@ -80,7 +82,7 @@ struct CoinManager {
     }
     
     // USING DATA EXTENSION
-    func handleGetRateResponse(_ response: Data) {
+    func handleGetCurrencyRateResponse(_ response: Data) {
         let result: RateResponse? = response.toJSON()
         delegate?.handleGetRateResponse(response: result, error: nil)
     }
